@@ -213,7 +213,7 @@
 
 <div class="header">
   <h1>🏠 خدمة صيانة المنزل — رأيك يهمنا</h1>
-  <p>نختبر خدمة صيانة منزلية شهرية تهدف إلى اكتشاف المشكلات قبل أن تتحول إلى أعطال مكلفة. رأيك الصادق يستغرق 3 دقائق ويساعدنا في بناء خدمة مفيدة حقاً للعائلات في الرياض.</p>
+  <p>نختبر خدمة صيانة منزلية شهرية تهدف إلى اكتشاف المشكلات قبل أن تتحول إلى أعطال مكلفة. رأيك الصادق لا يستغرق سوى دقيقتين ويساعدنا في بناء خدمة مفيدة حقاً للعائلات في الرياض.</p>
 </div>
 
 <div class="notice-bar">
@@ -236,8 +236,9 @@
         <label class="option"><input type="radio" name="home_type" value="شقة 3 غرف"> شقة 3 غرف نوم</label>
         <label class="option"><input type="radio" name="home_type" value="شقة 4 غرف فأكثر"> شقة 4 غرف نوم فأكثر</label>
         <label class="option"><input type="radio" name="home_type" value="فيلا"> فيلا</label>
-        <label class="option"><input type="radio" name="home_type" value="أخرى"> أخرى</label>
+        <label class="option"><input type="radio" name="home_type" value="أخرى" id="home_type_other_radio"> أخرى</label>
       </div>
+      <input type="text" id="home_type_other_text" name="home_type_other" placeholder="يرجى وصف نوع منزلك..." style="display:none; margin-top:8px;">
     </div>
 
     <div class="question">
@@ -276,8 +277,9 @@
         <label class="option"><input type="checkbox" name="issue_types" value="كهرباء"> كهرباء</label>
         <label class="option"><input type="checkbox" name="issue_types" value="إصلاحات عامة"> إصلاحات عامة / نجارة</label>
         <label class="option"><input type="checkbox" name="issue_types" value="دهانات"> دهانات</label>
-        <label class="option"><input type="checkbox" name="issue_types" value="أخرى"> أخرى</label>
+        <label class="option"><input type="checkbox" name="issue_types" value="أخرى" id="issue_other_check"> أخرى</label>
       </div>
+      <input type="text" id="issue_other_text" name="issue_types_other" placeholder="يرجى وصف نوع المشكلة..." style="display:none; margin-top:8px;">
     </div>
 
     <div class="question">
@@ -403,28 +405,6 @@
     </div>
 
     <div class="question">
-      <label class="q-label">ما السعر المناسب لك شهرياً؟ <span class="req">*</span></label>
-      <p style="font-size:12px; color:#777; margin-bottom:12px;">أدخل المبلغ بالريال السعودي لكل خانة. يمكنك تركها فارغة إن لم تكن متأكداً.</p>
-      <div class="vw-grid">
-        <div class="vw-item">
-          <label>رخيص جداً</label>
-          <div class="desc">يجعلك تشك في الجودة</div>
-          <div class="sar-wrap"><input type="number" name="price_too_cheap" placeholder="100" min="0" max="9999"></div>
-        </div>
-        <div class="vw-item">
-          <label>سعر عادل</label>
-          <div class="desc">قيمة مقابل الخدمة</div>
-          <div class="sar-wrap"><input type="number" name="price_fair" placeholder="150" min="0" max="9999" required></div>
-        </div>
-        <div class="vw-item">
-          <label>غالٍ جداً</label>
-          <div class="desc">سيجعلك تتردد</div>
-          <div class="sar-wrap"><input type="number" name="price_too_expensive" placeholder="300" min="0" max="9999"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="question">
       <label class="q-label">ما الذي سيجعل هذه الخدمة ضرورية لعائلتك؟ <span class="opt">(اختياري)</span></label>
       <textarea name="must_have_factors" placeholder="مثال: فنيون موثوقون، ضمان وقت الاستجابة، حجز عبر واتساب، سعر ثابت بدون مفاجآت..."></textarea>
     </div>
@@ -489,6 +469,20 @@ function setSubscribe(val, el) {
   document.getElementById('would_subscribe').value = val;
 }
 
+// Show/hide "Other" text inputs
+document.querySelectorAll('input[name="home_type"]').forEach(function(r) {
+  r.addEventListener('change', function() {
+    var t = document.getElementById('home_type_other_text');
+    t.style.display = this.value === 'أخرى' ? 'block' : 'none';
+    if (this.value !== 'أخرى') t.value = '';
+  });
+});
+document.getElementById('issue_other_check').addEventListener('change', function() {
+  var t = document.getElementById('issue_other_text');
+  t.style.display = this.checked ? 'block' : 'none';
+  if (!this.checked) t.value = '';
+});
+
 document.getElementById('surveyForm').addEventListener('submit', async function(e) {
   e.preventDefault();
   if (!document.getElementById('would_subscribe').value) {
@@ -500,9 +494,18 @@ document.getElementById('surveyForm').addEventListener('submit', async function(
   btn.disabled = true;
   try {
     const data = new FormData(this);
-    const issueVals = data.getAll('issue_types').join(', ');
+    // Merge "Other" home type free text
+    if (data.get('home_type') === 'أخرى' && data.get('home_type_other')) {
+      data.set('home_type', 'أخرى: ' + data.get('home_type_other'));
+    }
+    data.delete('home_type_other');
+    // Merge issue types; append "Other" free text if filled
+    let issueVals = data.getAll('issue_types');
+    const issueOther = (data.get('issue_types_other') || '').trim();
     while (data.has('issue_types')) data.delete('issue_types');
-    data.append('issue_types', issueVals);
+    data.delete('issue_types_other');
+    if (issueOther) issueVals = issueVals.map(v => v === 'أخرى' ? 'أخرى: ' + issueOther : v);
+    data.append('issue_types', issueVals.join(', '));
     const response = await fetch(this.action, {
       method: 'POST', body: data,
       headers: { 'Accept': 'application/json' }
