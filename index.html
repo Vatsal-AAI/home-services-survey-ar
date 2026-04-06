@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>خدمة صيانة المنزل — رأيك يهمنا</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', 'Arial', Tahoma, sans-serif;
+    background: #f5f5f5;
+    color: #333;
+    line-height: 1.8;
+    direction: rtl;
+    text-align: right;
+  }
+  .header {
+    background: linear-gradient(135deg, #1b4f72, #2e86c1);
+    color: white;
+    padding: 36px 24px 28px;
+    text-align: center;
+  }
+  .header h1 { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
+  .header p { font-size: 14px; opacity: 0.9; max-width: 500px; margin: 0 auto; line-height: 1.8; }
+  .notice-bar {
+    background: #fef9e7;
+    border-bottom: 1px solid #f9e79f;
+    padding: 12px 20px;
+    text-align: center;
+    font-size: 13px;
+    color: #7d6608;
+  }
+  .notice-bar strong { color: #5d4e08; }
+  .form-wrapper {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 20px 16px 60px;
+  }
+  .section-card {
+    background: white;
+    border-radius: 8px;
+    padding: 22px;
+    margin-bottom: 14px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  .section-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1b4f72;
+    margin-bottom: 18px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #d6eaf8;
+    display: flex;
+    align-items: center;
+    flex-direction: row-reverse;
+    gap: 8px;
+  }
+  .section-title .num {
+    background: #2e86c1;
+    color: white;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+  .packages-intro {
+    font-size: 13px;
+    color: #555;
+    margin-bottom: 16px;
+    line-height: 1.8;
+  }
+  .package-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .pkg-card {
+    border: 2px solid #d6eaf8;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .pkg-card:hover { border-color: #2e86c1; box-shadow: 0 2px 8px rgba(46,134,193,0.15); }
+  .pkg-card.selected { border-color: #1b4f72; box-shadow: 0 2px 12px rgba(27,79,114,0.2); }
+  .pkg-header {
+    background: #eaf4fb;
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+  }
+  .pkg-card.selected .pkg-header { background: #2e86c1; color: white; }
+  .pkg-title { font-weight: 700; font-size: 14px; }
+  .pkg-price { font-weight: 700; font-size: 16px; color: #1b4f72; white-space: nowrap; }
+  .pkg-card.selected .pkg-price { color: white; }
+  .pkg-body { padding: 14px 16px; font-size: 13px; line-height: 1.9; color: #444; }
+  .pkg-body ul { padding-right: 18px; padding-left: 0; margin: 4px 0 8px; }
+  .pkg-body li { margin-bottom: 3px; }
+  .pkg-body .pkg-note { font-size: 12px; color: #888; margin-top: 8px; font-style: italic; }
+  .pkg-body .pkg-extra { color: #555; margin-top: 6px; }
+  .pkg-select-row {
+    display: flex;
+    align-items: center;
+    flex-direction: row-reverse;
+    gap: 8px;
+    padding: 10px 16px;
+    background: #f8f9fa;
+    border-top: 1px solid #e8e8e8;
+    font-size: 13px;
+    color: #555;
+    cursor: pointer;
+  }
+  .pkg-card.selected .pkg-select-row { background: #d6eaf8; color: #1b4f72; font-weight: 600; }
+  .pkg-select-row .radio-dot {
+    width: 18px; height: 18px;
+    border: 2px solid #aaa;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .pkg-card.selected .radio-dot { border-color: #1b4f72; background: #1b4f72; }
+  .pkg-card.selected .radio-dot::after { content: ''; width: 8px; height: 8px; background: white; border-radius: 50%; }
+
+  .question { margin-bottom: 22px; }
+  .question:last-child { margin-bottom: 0; }
+  .question label.q-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #202124;
+  }
+  .q-label .req { color: #c0392b; margin-right: 0; margin-left: 2px; }
+  .q-label .opt { font-weight: 400; color: #888; font-size: 12px; margin-right: 4px; }
+  .option-group { display: flex; flex-direction: column; gap: 7px; }
+  .option {
+    display: flex;
+    align-items: center;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 9px 14px;
+    border: 1px solid #d5d8dc;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .option:hover { background: #eaf4fb; border-color: #2e86c1; }
+  .option input[type="radio"],
+  .option input[type="checkbox"] {
+    width: 17px; height: 17px;
+    accent-color: #1b4f72;
+    flex-shrink: 0; cursor: pointer;
+    margin: 0;
+  }
+  input[type="text"], input[type="email"], input[type="tel"], input[type="number"], textarea {
+    width: 100%; padding: 10px 14px;
+    border: 1px solid #d5d8dc; border-radius: 6px;
+    font-size: 14px; font-family: inherit; color: #202124; outline: none;
+    transition: border-color 0.15s;
+    text-align: right;
+    direction: rtl;
+  }
+  input[type="text"]:focus, input[type="email"]:focus,
+  input[type="tel"]:focus, input[type="number"]:focus, textarea:focus {
+    border-color: #2e86c1;
+    box-shadow: 0 0 0 2px rgba(46,134,193,0.15);
+  }
+  textarea { resize: vertical; min-height: 80px; }
+
+  .vw-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 8px; }
+  .vw-item label { display: block; font-size: 12px; font-weight: 700; color: #555; margin-bottom: 5px; }
+  .vw-item .desc { font-size: 11px; color: #888; margin-bottom: 6px; }
+  .vw-item input { text-align: center; font-size: 16px; font-weight: 600; direction: ltr; }
+  .sar-wrap { position: relative; }
+  .sar-wrap::after { content: 'ر.س'; position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 11px; color: #888; font-weight: 500; }
+  .sar-wrap input { padding-left: 32px; }
+  @media (max-width: 420px) { .vw-grid { grid-template-columns: 1fr; } }
+
+  .subscribe-row { display: flex; gap: 10px; flex-direction: row-reverse; }
+  .sub-btn {
+    flex: 1; padding: 12px; border: 2px solid #d5d8dc;
+    border-radius: 8px; text-align: center;
+    cursor: pointer; font-size: 14px; font-weight: 700;
+    transition: all 0.15s; user-select: none;
+  }
+  .sub-btn:hover { border-color: #2e86c1; background: #eaf4fb; }
+  .sub-btn.yes-btn.active { background: #27ae60; border-color: #27ae60; color: white; }
+  .sub-btn.maybe-btn.active { background: #e67e22; border-color: #e67e22; color: white; }
+  .sub-btn.no-btn.active { background: #c0392b; border-color: #c0392b; color: white; }
+
+  .submit-btn {
+    background: #1b4f72; color: white; border: none;
+    padding: 14px 40px; font-size: 16px; font-weight: 700;
+    border-radius: 6px; cursor: pointer; width: 100%; margin-top: 8px;
+    transition: background 0.2s;
+  }
+  .submit-btn:hover { background: #154360; }
+  .cta-note { font-size: 12px; color: #888; text-align: center; margin-top: 8px; }
+  .success-screen { display: none; text-align: center; padding: 60px 24px; background: white; border-radius: 8px; }
+  .success-screen .icon { font-size: 56px; margin-bottom: 16px; }
+  .success-screen h2 { font-size: 22px; color: #1b4f72; margin-bottom: 10px; }
+  .success-screen p { color: #555; font-size: 14px; line-height: 1.8; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🏠 خدمة صيانة المنزل — رأيك يهمنا</h1>
+  <p>نختبر خدمة صيانة منزلية شهرية تهدف إلى اكتشاف المشكلات قبل أن تتحول إلى أعطال مكلفة. رأيك الصادق يستغرق 3 دقائق ويساعدنا في بناء خدمة مفيدة حقاً للعائلات في الرياض.</p>
+</div>
+
+<div class="notice-bar">
+  <strong>لماذا هذا مهم؟</strong> إصلاح الأعطال المفاجئة في المنازل قد يكلف 500–1,000 ريال أو أكثر لكل مشكلة. هذه الخدمة مصممة للوقاية قبل الوصول لذلك.
+</div>
+
+<div class="form-wrapper">
+<form id="surveyForm" action="https://formsubmit.co/vatsal@aashishintelligence.com" method="POST">
+<input type="hidden" name="_subject" value="Arabic Survey Response — OA Makin Build">
+
+  <!-- القسم 1: منزلك -->
+  <div class="section-card">
+    <div class="section-title"><span class="num">١</span> معلومات عن منزلك</div>
+
+    <div class="question">
+      <label class="q-label">ما نوع منزلك؟ <span class="req">*</span></label>
+      <div class="option-group">
+        <label class="option"><input type="radio" name="home_type" value="شقة غرفتين" required> شقة غرفتين (2 غرف نوم)</label>
+        <label class="option"><input type="radio" name="home_type" value="شقة 3 غرف"> شقة 3 غرف نوم</label>
+        <label class="option"><input type="radio" name="home_type" value="شقة 4 غرف فأكثر"> شقة 4 غرف نوم فأكثر</label>
+        <label class="option"><input type="radio" name="home_type" value="فيلا"> فيلا</label>
+        <label class="option"><input type="radio" name="home_type" value="أخرى"> أخرى</label>
+      </div>
+    </div>
+
+    <div class="question">
+      <label class="q-label">هل أنت مالك أم مستأجر؟ <span class="req">*</span></label>
+      <div class="option-group">
+        <label class="option"><input type="radio" name="ownership" value="مستأجر" required> مستأجر</label>
+        <label class="option"><input type="radio" name="ownership" value="مالك"> مالك</label>
+      </div>
+    </div>
+
+    <div class="question">
+      <label class="q-label">الحي أو المدينة؟ <span class="req">*</span></label>
+      <input type="text" name="location" placeholder="مثال: الملقا، الياسمين، الرياض..." required>
+    </div>
+  </div>
+
+  <!-- القسم 2: تجربة الصيانة -->
+  <div class="section-card">
+    <div class="section-title"><span class="num">٢</span> تجربتك مع الصيانة</div>
+
+    <div class="question">
+      <label class="q-label">كم مرة احتجت لفني صيانة خلال الـ 12 شهراً الماضية؟ <span class="req">*</span></label>
+      <div class="option-group">
+        <label class="option"><input type="radio" name="service_frequency" value="لا شيء" required> لم أحتج لأحد</label>
+        <label class="option"><input type="radio" name="service_frequency" value="1-2 مرات"> 1–2 مرات</label>
+        <label class="option"><input type="radio" name="service_frequency" value="3-5 مرات"> 3–5 مرات</label>
+        <label class="option"><input type="radio" name="service_frequency" value="6 مرات فأكثر"> 6 مرات أو أكثر</label>
+      </div>
+    </div>
+
+    <div class="question">
+      <label class="q-label">ما نوع المشكلات التي واجهتها؟ (اختر كل ما ينطبق)</label>
+      <div class="option-group">
+        <label class="option"><input type="checkbox" name="issue_types" value="تكييف / HVAC"> تكييف / HVAC</label>
+        <label class="option"><input type="checkbox" name="issue_types" value="سباكة"> سباكة</label>
+        <label class="option"><input type="checkbox" name="issue_types" value="كهرباء"> كهرباء</label>
+        <label class="option"><input type="checkbox" name="issue_types" value="إصلاحات عامة"> إصلاحات عامة / نجارة</label>
+        <label class="option"><input type="checkbox" name="issue_types" value="دهانات"> دهانات</label>
+        <label class="option"><input type="checkbox" name="issue_types" value="أخرى"> أخرى</label>
+      </div>
+    </div>
+
+    <div class="question">
+      <label class="q-label">كيف تجد فنياً عادةً عند الحاجة؟</label>
+      <div class="option-group">
+        <label class="option"><input type="radio" name="find_method" value="توصيات شخصية"> توصيات شخصية (أهل / أصدقاء)</label>
+        <label class="option"><input type="radio" name="find_method" value="تطبيق إلكتروني"> تطبيق إلكتروني (داري، بعاك، وغيرها)</label>
+        <label class="option"><input type="radio" name="find_method" value="إدارة المبنى"> إدارة المبنى</label>
+        <label class="option"><input type="radio" name="find_method" value="تواصل مباشر مع مقاول"> تواصل مباشر مع مقاول</label>
+        <label class="option"><input type="radio" name="find_method" value="وسائل التواصل الاجتماعي"> وسائل التواصل الاجتماعي</label>
+        <label class="option"><input type="radio" name="find_method" value="أجد صعوبة في إيجاد فني موثوق"> أجد صعوبة في إيجاد فني موثوق</label>
+      </div>
+    </div>
+  </div>
+
+  <!-- القسم 3: الباقات -->
+  <div class="section-card">
+    <div class="section-title"><span class="num">٣</span> تفاصيل الخدمة والباقات</div>
+
+    <p class="packages-intro">فيما يلي الباقات التي نختبرها. كل باقة تشمل زيارة وقائية شهرية مجدولة وزيارة طوارئ عند الحاجة. يرجى الاطلاع على التفاصيل ثم مشاركتنا رأيك.</p>
+
+    <div class="package-cards">
+
+      <!-- الباقة 1 -->
+      <div class="pkg-card" id="pkg1" onclick="selectPackage('pkg1', 'الباقة 1 — شقة غرفتين (100 ريال/شهر)')">
+        <div class="pkg-header">
+          <span class="pkg-title">الباقة 1 — شقة 2 غرف نوم</span>
+          <span class="pkg-price">100 ريال / شهر</span>
+        </div>
+        <div class="pkg-body">
+          <strong>زيارة الصيانة الوقائية (مرة في الشهر) تشمل:</strong>
+          <ul>
+            <li><strong>التكييف:</strong> تنظيف داخلي، فحص تدفق الهواء، تفتيش الصرف</li>
+            <li><strong>السباكة:</strong> فحص التسربات، ضغط المياه، معالجة المصارف</li>
+            <li><strong>الكهرباء:</strong> المفاتيح، المقابس، فحص لوحة التوزيع، إصلاحات بسيطة</li>
+            <li><strong>عام:</strong> فحص تسربات الجدران والأسقف، قياس الرطوبة</li>
+          </ul>
+          <div class="pkg-extra">📋 تقرير مكتوب بعد كل زيارة</div>
+          <div class="pkg-extra">🚨 <strong>زيارة طوارئ:</strong> زيارة واحدة عند الحاجة كل شهر</div>
+          <div class="pkg-extra">❄️ <strong>تنظيف مكيف خارجي:</strong> مرة كل 3 أشهر</div>
+          <div class="pkg-extra">➕ زيارات طوارئ إضافية: 50 ريال / زيارة</div>
+          <div class="pkg-note">القطع الكبيرة والإصلاحات الجوهرية غير مشمولة</div>
+        </div>
+        <div class="pkg-select-row">
+          <div class="radio-dot"></div>
+          هذه الباقة تناسب منزلي
+        </div>
+      </div>
+
+      <!-- الباقة 2 -->
+      <div class="pkg-card" id="pkg2" onclick="selectPackage('pkg2', 'الباقة 2 — شقة 3 غرف (150 ريال/شهر)')">
+        <div class="pkg-header">
+          <span class="pkg-title">الباقة 2 — شقة 3 غرف نوم</span>
+          <span class="pkg-price">150 ريال / شهر</span>
+        </div>
+        <div class="pkg-body">
+          <strong>نفس نطاق الباقة الأولى مع تكيّف مع حجم الوحدة الأكبر:</strong>
+          <ul>
+            <li>فحص التكييف، السباكة، الكهرباء، والفحص العام — كلها مشمولة</li>
+            <li>تقرير مكتوب بعد كل زيارة</li>
+            <li>زيارة طوارئ واحدة شهرياً</li>
+            <li>تنظيف مكيف خارجي كل 3 أشهر</li>
+          </ul>
+          <div class="pkg-extra">➕ زيارات طوارئ إضافية: 50 ريال / زيارة</div>
+          <div class="pkg-note">القطع الكبيرة والإصلاحات الجوهرية غير مشمولة</div>
+        </div>
+        <div class="pkg-select-row">
+          <div class="radio-dot"></div>
+          هذه الباقة تناسب منزلي
+        </div>
+      </div>
+
+      <!-- الباقة 3 -->
+      <div class="pkg-card" id="pkg3" onclick="selectPackage('pkg3', 'الباقة 3 — فيلا (من 250 ريال/شهر)')">
+        <div class="pkg-header">
+          <span class="pkg-title">الباقة 3 — فيلا</span>
+          <span class="pkg-price">تبدأ من 250 ريال / شهر</span>
+        </div>
+        <div class="pkg-body">
+          <strong>صيانة منزلية شاملة + عناية بالمساحات الخارجية:</strong>
+          <ul>
+            <li>جميع خدمات الباقتين 1 و2</li>
+            <li>تغطية موسّعة للمنازل الكبيرة (الطابق الأرضي والعلوي)</li>
+            <li>صيانة الحديقة والمناطق الخارجية الأساسية</li>
+            <li>أولوية في جدولة زيارات الطوارئ</li>
+          </ul>
+          <div class="pkg-extra">➕ زيارات طوارئ إضافية: 50 ريال / زيارة</div>
+          <div class="pkg-note">القطع الكبيرة والإصلاحات الجوهرية غير مشمولة. السعر النهائي يعتمد على مساحة الفيلا.</div>
+        </div>
+        <div class="pkg-select-row">
+          <div class="radio-dot"></div>
+          هذه الباقة تناسب منزلي
+        </div>
+      </div>
+
+      <!-- لا شيء -->
+      <div class="pkg-card" id="pkg0" onclick="selectPackage('pkg0', 'لا تنطبق علي أي باقة')">
+        <div class="pkg-header">
+          <span class="pkg-title">لا تنطبق علي أي من هذه الباقات</span>
+        </div>
+        <div class="pkg-select-row">
+          <div class="radio-dot"></div>
+          نوع منزلي غير مذكور أعلاه
+        </div>
+      </div>
+    </div>
+
+    <input type="hidden" name="relevant_package" id="relevant_package" value="">
+  </div>
+
+  <!-- القسم 4: رأيك -->
+  <div class="section-card">
+    <div class="section-title"><span class="num">٤</span> رأيك الصادق</div>
+
+    <div class="question">
+      <label class="q-label">هل ستشترك في هذه الخدمة؟ <span class="req">*</span></label>
+      <input type="hidden" name="would_subscribe" id="would_subscribe" required>
+      <div class="subscribe-row">
+        <div class="sub-btn yes-btn" onclick="setSubscribe('نعم', this)">✅ نعم</div>
+        <div class="sub-btn maybe-btn" onclick="setSubscribe('ربما', this)">🤔 ربما</div>
+        <div class="sub-btn no-btn" onclick="setSubscribe('لا', this)">❌ لا</div>
+      </div>
+    </div>
+
+    <div class="question">
+      <label class="q-label">ما السعر المناسب لك شهرياً؟ <span class="req">*</span></label>
+      <p style="font-size:12px; color:#777; margin-bottom:12px;">أدخل المبلغ بالريال السعودي لكل خانة. يمكنك تركها فارغة إن لم تكن متأكداً.</p>
+      <div class="vw-grid">
+        <div class="vw-item">
+          <label>رخيص جداً</label>
+          <div class="desc">يجعلك تشك في الجودة</div>
+          <div class="sar-wrap"><input type="number" name="price_too_cheap" placeholder="100" min="0" max="9999"></div>
+        </div>
+        <div class="vw-item">
+          <label>سعر عادل</label>
+          <div class="desc">قيمة مقابل الخدمة</div>
+          <div class="sar-wrap"><input type="number" name="price_fair" placeholder="150" min="0" max="9999" required></div>
+        </div>
+        <div class="vw-item">
+          <label>غالٍ جداً</label>
+          <div class="desc">سيجعلك تتردد</div>
+          <div class="sar-wrap"><input type="number" name="price_too_expensive" placeholder="300" min="0" max="9999"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="question">
+      <label class="q-label">ما الذي سيجعل هذه الخدمة ضرورية لعائلتك؟ <span class="opt">(اختياري)</span></label>
+      <textarea name="must_have_factors" placeholder="مثال: فنيون موثوقون، ضمان وقت الاستجابة، حجز عبر واتساب، سعر ثابت بدون مفاجآت..."></textarea>
+    </div>
+
+    <div class="question">
+      <label class="q-label">أي تعليق أو اقتراح إضافي؟ <span class="opt">(اختياري)</span></label>
+      <textarea name="other_feedback" placeholder="أي أفكار أو ملاحظات أخرى تودّ مشاركتها..."></textarea>
+    </div>
+  </div>
+
+  <!-- القسم 5: التواصل -->
+  <div class="section-card" style="background: #f8fbfd; border: 1px solid #d6eaf8;">
+    <div class="section-title"><span class="num">٥</span> ابقَ على تواصل <span style="font-weight:400; font-size:13px; color:#888;">(اختياري)</span></div>
+    <p style="font-size:13px; color:#666; margin-bottom:18px;">إذا كنت تودّ أن تكون من أوائل من يعلم بإطلاق الخدمة، أدخل بياناتك أدناه.</p>
+
+    <div class="question">
+      <label class="q-label">الاسم <span class="opt">(اختياري)</span></label>
+      <input type="text" name="contact_name" placeholder="اسمك">
+    </div>
+
+    <div class="question">
+      <label class="q-label">رقم الجوال / واتساب <span class="opt">(اختياري)</span></label>
+      <input type="tel" name="contact_phone" placeholder="+966 5X XXX XXXX" style="direction:ltr; text-align:left;">
+    </div>
+
+    <div class="question">
+      <label class="q-label">طريقة التواصل المفضلة</label>
+      <div class="option-group">
+        <label class="option"><input type="radio" name="contact_pref" value="واتساب"> واتساب</label>
+        <label class="option"><input type="radio" name="contact_pref" value="مكالمة هاتفية"> مكالمة هاتفية</label>
+        <label class="option"><input type="radio" name="contact_pref" value="أفضّل عدم التواصل"> أفضّل عدم التواصل</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-card" style="text-align:center; background:#f8fbfd; border:1px solid #d6eaf8;">
+    <p style="font-size:13px; color:#555; margin-bottom:16px;">شكراً لمساعدتنا في بناء خدمة أفضل للعائلات في الرياض.</p>
+    <button type="submit" class="submit-btn">إرسال الإجابات ←</button>
+    <p class="cta-note">إجاباتك سرية وتُستخدم فقط لأغراض التخطيط.</p>
+  </div>
+
+</form>
+
+<div class="success-screen" id="successScreen">
+  <div class="icon">✅</div>
+  <h2>شكراً جزيلاً على مشاركتك!</h2>
+  <p>تم تسجيل إجاباتك بنجاح.<br>نقدّر وقتك ومساهمتك في تحسين الخدمة.</p>
+</div>
+
+</div>
+
+<script>
+function selectPackage(id, label) {
+  document.querySelectorAll('.pkg-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById(id).classList.add('selected');
+  document.getElementById('relevant_package').value = label;
+}
+
+function setSubscribe(val, el) {
+  document.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('would_subscribe').value = val;
+}
+
+document.getElementById('surveyForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  if (!document.getElementById('would_subscribe').value) {
+    alert('يرجى تحديد إجابتك: هل ستشترك في الخدمة؟');
+    return;
+  }
+  const btn = this.querySelector('.submit-btn');
+  btn.textContent = 'جاري الإرسال...';
+  btn.disabled = true;
+  try {
+    const data = new FormData(this);
+    const response = await fetch(this.action, {
+      method: 'POST', body: data,
+      headers: { 'Accept': 'application/json' }
+    });
+    if (response.ok) {
+      this.style.display = 'none';
+      document.getElementById('successScreen').style.display = 'block';
+      window.scrollTo(0, 0);
+    } else {
+      btn.textContent = 'إرسال الإجابات ←';
+      btn.disabled = false;
+      alert('حدث خطأ أثناء الإرسال. يرجى المحاولة مجدداً.');
+    }
+  } catch (err) {
+    btn.textContent = 'إرسال الإجابات ←';
+    btn.disabled = false;
+    alert('خطأ في الاتصال. يرجى التحقق من الإنترنت والمحاولة مجدداً.');
+  }
+});
+</script>
+</body>
+</html>
