@@ -500,6 +500,9 @@ document.getElementById('surveyForm').addEventListener('submit', async function(
   btn.disabled = true;
   try {
     const data = new FormData(this);
+    const issueVals = data.getAll('issue_types').join(', ');
+    while (data.has('issue_types')) data.delete('issue_types');
+    data.append('issue_types', issueVals);
     const response = await fetch(this.action, {
       method: 'POST', body: data,
       headers: { 'Accept': 'application/json' }
